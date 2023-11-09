@@ -76,7 +76,6 @@ const update = async (req, res) => {
       }
     await post.save();
 
-
     res.json({ post });
   } catch (err) {
     return res.status(400).json({
@@ -105,7 +104,7 @@ const remove = async (req, res, next) => {
 
 const addCommentToPost = async (req, res) => {
   try {
-    const { postId, commentId } = req.body; // Se espera que la solicitud incluya postId y commentId en el cuerpo
+    const { postId, commentId } = req.body; // Se espera que la solicitud incluya postId y commentId en el cuerpo siguiente (solicitados en el dogigo siguente)
 
     const post = await Post.findById(postId);
 
@@ -114,12 +113,12 @@ const addCommentToPost = async (req, res) => {
         error: 'Post not found' 
       });
     }
-    post.comments.push(commentId);// Agrega el commentId al post
-    await post.save();// Guarda el post actualizado en la base de datos
+    post.comments.push(commentId); // Agrega el commentId al post
+    await post.save(); // Guarda el post actualizado en la base de datos
     return res.status(200).json({
       message: 'Comment successfully added!'
     });
-  } catch (err) { // si la operación falla ejecuta estos procedimientos
+  } catch (err) { 
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err)
     });
@@ -165,35 +164,6 @@ const addunlikePost = async (req, res) => {
   }
 };
 
-const editPost = async (req, res) => {
-  try {
-    // Obtén el ID del post a editar desde los parámetros de la URL
-    const postId = req.params.postId;
-
-    // Busca el post en la base de datos
-    const post = await Post.findById(postId);
-
-    // Verifica si el post existe
-    if (!post) {
-      return res.status(404).json({ error: 'El post no se encuentra.' });
-    }
-
-    // Verifica si el usuario autenticado es el autor del post
-    if (post.author !== req.user._id) {
-      return res.status(403).json({ error: 'No tienes permiso para editar este post.' });
-    }
-
-    // Actualiza el contenido del post con los datos enviados en el cuerpo de la solicitud
-    post.content = req.body.content;
-
-    // Guarda los cambios en la base de datos
-    await post.save();
-
-    return res.status(200).json({ message: 'El post ha sido editado exitosamente.' });
-  } catch (error) {
-    return res.status(500).json({ error: 'Se produjo un error al editar el post.' });
-  }
-};
 
 export default {
   create,
@@ -205,6 +175,5 @@ export default {
   addCommentToPost,
   defaultPhoto,
   addlikePost,
-  addunlikePost,
-  editPost
+  addunlikePost
 };
